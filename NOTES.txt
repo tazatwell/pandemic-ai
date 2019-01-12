@@ -1,0 +1,12 @@
+Developer Notes:
+
+Updated 1.12.19:
+
+1. Create the board game Pandemic
+	1.1 Store the map as a graph, w vertices and edges.
+	1.2 Store the player deck and infection deck using an array.
+	1.3 Each city will also have a counter for the number of disease cubes in that city.
+2. Use TravisCI for automated unit testing.
+
+
+
