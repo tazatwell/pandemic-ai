@@ -23,12 +23,23 @@ class City:
 #get list of cities
 citiesList = [];
 
-f = open('cities.txt', r);
+f = open('cities.txt', 'r');
 for i in f:
 	citiesList.append(i);
 
-for i in citiesList:
-	print(i);
+#works
+#for i in citiesList:
+#	print(i);
+
+print(len(citiesList));
+
+
+
+
+
+
+
+
 
 
 
