@@ -3,7 +3,7 @@ Chicago
 Montreal
 Atlanta
 New York
-Washington D.C.
+Washington
 London
 Paris
 Madrid

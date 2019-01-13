@@ -1,281 +1,186 @@
-San Francisco
-Tokyo
-Manila
-Los Angeles
-Chicago
-End
-Chicago
-San Francisco
-Lost Angeles
-Mexico City
-Atlanta
-Montreal
-End
-Montreal
-Chicago
-Washington
-New York
-End
-Atlanta
-Chicago
-Miami
-Washington
-End
-Washington
-Montreal
-Miami
-New York
-Atlanta
-End
-New York
-Montreal
-Washington
-London
-Madrid
-End
-London
-New York
-Essen
-Paris
-Madrid
-End
-Madrid
-New York
-London
-Paris
-Algiers
-Sao Paulo
-End
-Essen
-London
-St. Petersburg
-Milan
-Paris
-End
-St. Petersburg
-Essen
-Istanbul
-Moscow
-End
-Milan
-Essen
-Istanbul
-Milan
-End
-Paris
-London
-Essen
-Milan
-Algiers
-Madrid
-End
-Los Angeles
-San Francisco
-Chicago
-Mexico City
-Sydney
-End
-Mexico City
-Lost Angeles
-Chicago
-Miami
-Bogota
-Lima
-End
-Miami
-Mexico City
-Atlanta
-Washington
-Bogota
-End
-Bogota
-Mexicto City
-Miami
-Sao Paolo
-Buenos AIres
-Lima
-End
-Lima
-Mexico City
-Bogota
-Santiago
-End
-Santiago
-Lima
-End
-Buenos Aires
-Bogota
-Sao Paolo
-End
-Sao Paolo
-Bogota
-Madrid
-Lhasa
-Buenos Aires
-End
-Lhasa
-Sao Paolo
-Khartoum
-Kinshasa
-End
-Khartoum
-Lhasa
-Cairo
-Kinshasa
-Johannesburg
-End
-Kinshasa
-Lhasa
-Khartoum
-Johannesburg
-End
-Johannesburg
-Kinshasa
-Khartoum
-End
-Algiers
-Madrid
-Paris
-Istanbul
-Cairo
-End
-Istanbul
-Algiers
-Milan
-St. Petersburg
-Moscow
-Baghdad
-Cairo
-End
-Cairo
-Algiers
-Istanbul
-Baghdad
-Riyadh
-Khartoum
-End
-Moscow
-St. Petersburg
-Tehran
-Istanbul
-End
-Baghdad
-Istanbul
-Tehran
-Karachi
-Riyadh
-Cairo
-End
-Riyadh
-Cairo
-Baghdad
-Karachi
-End
-Tehran
-Moscow
-Delhi
-Karachi
-Baghdad
-End
-Karachi
-Tehran
-Delhi
-Mumbai
-Riyadh
-Baghdad
-End
-Mumbai
-Karachi
-Delhi
-Chennai
-End
-Delhi
-Tehran
-Karachi
-Mumbai
-Chennai
-Kolkata
-End
-Chennai
-Mumbai
-Delhi
-Kolkata
-Bangkok
-Jakarta
-End
-Kolkata
-Delhi
-Hong Kong
-Shanghai
-Chennai
-End
-Beijing
-Seoul
-Shanghai
-End
-Seoul
-Beijing
-Tokyo
-Shanghai
-End
-Shanghai
-Beijing
-Seoul
-Tokyo
-Taipei
-Hong Kong
-End
-Tokyo
-Shanghai
-Seoul
-San Francisco
-Osaka
-End
-Hong Kong
-Shanghai
-Taipei
-Atlanta
-Ho Chi Minh City
-Bangkok
-Kolkata
-End
-Taipei
-Shanghai
-Osaka
-Manila
-Hong Kong
-End
-Osaka
-Taipei
-Tokyo
-End
-Bangkok
-Kolkata
-Hong Kong
-Ho Chi Minh City
-Jakarta
-Chennai
-End
-Ho Chi Minth City
-Bangkok
-Hong Kong
-Manila
-Jakarta
-End
-Manila
-Ho Chi Minh City
-Taipei
-San Francisco
-Sydney
-End
-Jakarta
-Chennai
-Bangkok
-Ho Chi Minh ity
-Sydney
-End
-Sydney
-Jakarta
-Manila
-Los Angeles
-End
+San Francisco - Tokyo
+Tokyo - San Francisco
+San Francisco - Manila
+Manila - San Francisco
+San Francisco - Chicago
+Chicago - San Francisco
+San Francisco - Los Angeles
+Los Angeles - San Francisco
+Chicago - Montreal
+Montreal - Chicago
+Chicago - Atlanta
+Atlanta - Chicago
+Chicago - Mexico City
+Mexico City - Chicago
+Chicago - Los Angeles
+Los Angeles - Chicago
+Montreal - New York
+New York - Montreal
+Montreal - Washington
+Washington - Montreal
+Atlanta - Washington
+Washington - Atlanta
+Atlanta - Miami
+Miami - Atlanta
+Washington - New York
+New York - Washington
+Washington - Miami
+Miami - Washington
+New York - London
+London - New York
+New York - Madrid
+Madrid - New York
+London - Madrid
+Madrid - London
+London - Essen
+Essen - London
+London - Paris
+Paris - London
+Madrid - Paris
+Paris - Madrid
+Madrid - Algiers
+Algiers - Madrid
+Madrid - Sao Paolo
+Sao Paolo - Madrid
+Essen - St. Petersburg
+St. Petersburg - Essen
+Essen - Milan
+Milan - Essen
+Essen - Paris
+Paris - Essen
+St. Petersburg - Moscow
+Moscow - St. Petersburg
+St. Petersburg - Istanbul
+Istanbul - St. Petersburg
+Paris - Milan
+Milan - Paris
+Paris - Algiers
+Algiers - Paris
+Milan - Istanbul
+Istanbul - Milan
+Los Angeles - Sydney
+Sydney - Los Angeles
+Los Angeles - Mexico City
+Mexico City - Los Angeles
+Mexico City - Miami
+Miami - Mexico City
+Mexico City - Bogota
+Bogota - Mexico City
+Mexico City - Lima
+Lima - Mexico City
+Miami - Bogota
+Bogota - Miami
+Bogota - Lima
+Lima - Bogota
+Bogota - Buenos Aires
+Buenos Aires - Bogota
+Bogota - Sao Paolo
+Sao Paolo - Bogota
+Lima - Santiago
+Santiago - Lima
+Buenos Aires - Sao Paolo
+Sao Paolo - Buenos Aires
+Sao Paolo - Lagos
+Lagos - Sao Paolo
+Lagos - Khartoum
+Khartoum - Lagos
+Lagos - Kinshasa
+Kinshasa - Lagos
+Kinshasa - Khartoum
+Khartoum - Kinshasa
+Kinshasa - Johannesburg
+Johannesburg - Kinshasa
+Johannesburg - Khartoum
+Khartoum - Johannesburg
+Khartoum - Cairo
+Cairo - Khartoum
+Algiers - Istanbul
+Istanbul - Algiers
+Algiers - Cairo
+Cairo - Algiers
+Istanbul - Moscow
+Moscow - Istanbul
+Istanbul - Cairo
+Cairo - Istanbul
+Istanbul - Baghdad
+Baghdad - Istanbul
+Cairo - Baghdad
+Baghdad - Cairo
+Cairo - Riyadh
+Riyadh - Cairo
+Moscow - Tehran
+Tehran - Moscow
+Baghdad - Tehran
+Tehran - Baghdad
+Baghdad - Karachi
+Karachi - Baghdad
+Baghdad - Riyadh
+Riyadh - Baghdad
+Tehran - Delhi
+Delhi - Tehran
+Tehran - Karachi
+Karachi - Tehran
+Riyadh - Karachi
+Karachi - Riyadh
+Karachi - Delhi
+Delhi - Karachi
+Karachi - Mumbai
+Mumbai - Karachi
+Mumbai - Delhi
+Delhi - Mumbai
+Mumbai - Chennai
+Chennai - Mumbai
+Delhi - Kolkata
+Kolkata - Delhi
+Delhi - Chennai
+Chennai - Delhi
+Kolkata - Hong Kong
+Hong Kong - Kolkata
+Kolkata - Bangkok
+Bangkok - Kolkata
+Kolkata - Chennai
+Chennai - Kolkata
+Chennai - Bangkok
+Bangkok - Chennai
+Chennai - Jakarta
+Jakarta - Chennai
+Seoul - Tokyo
+Tokyo - Seoul
+Seoul - Beijing
+Beijing - Seoul
+Seoul - Shanghai
+Shanghai - Seoul
+Beijing - Shanghai
+Shanghai - Beijing
+Shanghai - Tokyo
+Tokyo - Shanghai
+Shanghai - Taipei
+Taipei - Shanghai
+Shanghai - Hong Kong
+Hong Kong - Shanghai
+Tokyo - Osaka
+Osaka - Tokyo
+Hong Kong - Taipei
+Taipei - Hong Kong
+Hong Kong - Manila
+Manila - Hong Kong
+Hong Kong - Ho Chi Minh City
+Ho Chi Minh City - Hong Kong
+Hong Kong - Bangkok
+Bangkok - Hong Kong
+Taipei - Osaka
+Osaka - Taipei
+Taipei - Manila
+Manila - Taipei
+Bangkok - Ho Chi Minh City
+Ho Chi Minh City - Bangkok
+Bangkok - Jakarta
+Jakarta - Bangkok
+Ho Chi Minh City - Manila
+Manila - Ho Chi Minh City
+Ho Chi Minh City - Jakarta
+Jakarta - Ho Chi Minh City
+Manila - Sydney
+Sydney - Manila
+Jakarta - Sydney
+Sydney - Jakarta
