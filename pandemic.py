@@ -1,5 +1,7 @@
 #pandemic.py: The board game pandemic
 
+import random;
+
 #edge class:
 class Edge:
 	start = "San Francisco";
@@ -14,12 +16,33 @@ class City:
 	#list of edges from city to neighboring cities
 	neighbors = [];
 
+	numDiseaseCubes = 0;
+
+	hasResearchCenter = False;
+
 	#class constructor
-	def _init_(self, new_name, new_color, new_neighbors):
+	def __init__(self, new_name):
 		self.name = new_name;
-		self.color = new_color;
-		self.neighbors = new_neighbors;
-	
+		self.color = "blue";
+		self.neighbors = [];
+		self.numDiseaseCubes = 0;	
+		hasResearchCenter = False;
+
+	#print fn
+	def startCityPrint(self):
+		print("City - " + self.name);
+		print("\t" + "color: " + self.color);
+		print("\t" + str(self.numDiseaseCubes) + " disease cubes");
+		print("\t" + "research center - " + self.hasResearchCenter);
+		#if (self.hasResearchCenter == True):
+		#	print("\t" + "has research center");
+		#elif (self.hasResearchCenter == False):
+		#	print("\t" + "doesn't have research center");
+		print("\t" + "neighbors:");
+		for i in self.neighbors:
+			print("\t\t" + i);
+
+
 #get list of cities
 citiesList = [];
 
@@ -65,9 +88,83 @@ numEdges = 0;
 for i,j in edgesList.items():
 	if (j == 1):
 		numEdges = numEdges + 1;
-		print("there's an edge between " + i);
-print("number of directed edges is " + str(numEdges));
-print("number of bidirectional edges is " + str(numEdges/2));
+#		print("there's an edge between " + i);
+#print("number of directed edges is " + str(numEdges));
+#print("number of bidirectional edges is " + str(numEdges/2));
+
+
+#deck of infection cards:
+infectionCards = citiesList;
+
+
+#deck of player cards:
+playerCards = citiesList;
+
+#create list of colored cities:
+blueCities = ["San Francisco", "Chicago", "Montreal", "New York", "Atlanta", "Washington", "Madrid", "London", "Essen", "St. Petersburg", "Paris", "Milan"];
+
+yellowCities = ["Los Angeles", "Mexico City", "Miami", "Bogota", "Lima", "Santiago", "Sao Paolo", "Buenos Aires", "Lagos", "Khartoum", "Kinshasa", "Johannesburg"];
+
+blackCities = ["Moscow", "Tehran", "Istanbul", "Algiers", "Cairo", "Baghdad", "Karachi", "Delhi", "Kolkata", "Riyadh", "Mumbai", "Chennai"];
+
+redCities = ["Beijing", "Seoul", "Shanghai", "Tokyo", "Hong Kong", "Taipei", "Osaka", "Bangkok", "Ho Chi Minh City", "Manila", "Jakarta", "Sydney"];
+
+#initialize the cities:
+boardCities = {};
+for i in citiesList:
+	new_city = City(i);
+	if i in blueCities:
+		new_city.color = "blue";
+	elif i in yellowCities:
+		new_city.color = "yellow";
+	elif i in blackCities:
+		new_city.color = "black";
+	elif i in redCities:
+		new_city.color = "red";
+	else:
+		print("city not in colors list - " + i);
+		exit();
+	new_city.numDiseaseCubes = 0;
+	if (i == "Atlanta"):
+		new_city.hasResearchCenter = "true";
+	else:
+		new_city.hasResearchCenter = "false";
+	for j in citiesList:
+		search_string = i + " - " + j;
+		if (edgesList[search_string] == 1):
+			new_city.neighbors.append(j);
+	boardCities[i] = new_city;
+
+
+#print status of board after start of game:
+print("cities' status before game:");
+for i,j in boardCities.items():
+	#print("an element");
+	#print(j.name + '\t' + j.color + '\t' + str(j.numDiseaseCubes) + '\t' + j.hasResearchCenter + '\t');
+	j.startCityPrint();
+	#for neighbor in j.neighbors:
+		#print(neighbor);
+
+#list of character roles:
+character_roles = ["Scientist", "Medic", "Researcher", "Dispatcher", "Operations Expert", "Contingency Planner", "Quarantine Specialist"];
+players = [];
+
+numPlayers = int(input("how many players are playing?"));
+
+counter = 0;
+while (counter < numPlayers):
+	role = random.choice(character_roles);
+	players.append(role);
+	counter = counter + 1;
+
+count = 1;
+for i in players:
+	#player_no = i+1;
+	#player_no_string = str(player_no);
+	print("Player " + str(count) + " is the " + str(role) + "!");
+	count = count + 1;
+
+
 
 '''
 #list of edges

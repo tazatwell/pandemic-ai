@@ -7,6 +7,10 @@ Updated 1.12.19:
 	1.2 Store the player deck and infection deck using an array.
 	1.3 Each city will also have a counter for the number of disease cubes in that city.
 2. Use TravisCI for automated unit testing.
-
+3. Store number of players ( 1 - 7).
+4. Store all character roles.
+5. Randomly assign each character a player role.
+6. Create a player class - should have role, position, and list of cards
+	6.1 Create a card class - should have isEvent bool member and name.
 
 
