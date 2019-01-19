@@ -12,5 +12,8 @@ Updated 1.12.19:
 5. Randomly assign each character a player role.
 6. Create a player class - should have role, position, and list of cards
 	6.1 Create a card class - should have isEvent bool member and name.
-
+7. Loop - while game is not over, do:
+	7.1 Display options - print all cities w diseases, player info, for every nearby city print an option w coresponding number.
+	7.2 If player is on a city then you can remove diseases. Medic removes all diseases.
+	7.3 At end of turn, give player 2 hand cards and draw two cards from infection deck. infect cities and add to player
 

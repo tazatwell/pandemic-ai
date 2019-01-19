@@ -43,6 +43,27 @@ class City:
 			print("\t\t" + i);
 
 
+#Players
+class Player:
+	role = "Scientist";
+	position = "Atlanta";
+	cards = [];
+
+	#constructor
+	def __init__(self, new_role):
+		self.role = new_role;
+		self.position = "Atlanta";
+		self.cards = [];
+
+	def playerPrint(self):
+		print("Player - " + self.role);
+		print("\tin " + self.position);
+		print("\tHand:");
+		for i in self.cards:
+			print("\t\t" + i);
+
+
+
 #get list of cities
 citiesList = [];
 
@@ -94,7 +115,13 @@ for i,j in edgesList.items():
 
 
 #deck of infection cards:
-infectionCards = citiesList;
+infectionCards = [];
+for i in citiesList:
+	infectionCards.append(i);
+#print(infectionCards);
+#print(citiesList);
+#for i in citiesList:
+#	print(i);
 
 
 #deck of player cards:
@@ -137,11 +164,11 @@ for i in citiesList:
 
 
 #print status of board after start of game:
-print("cities' status before game:");
-for i,j in boardCities.items():
+#print("cities' status before game:");
+#for i,j in boardCities.items():
 	#print("an element");
 	#print(j.name + '\t' + j.color + '\t' + str(j.numDiseaseCubes) + '\t' + j.hasResearchCenter + '\t');
-	j.startCityPrint();
+	#j.startCityPrint();
 	#for neighbor in j.neighbors:
 		#print(neighbor);
 
@@ -154,16 +181,150 @@ numPlayers = int(input("how many players are playing?"));
 counter = 0;
 while (counter < numPlayers):
 	role = random.choice(character_roles);
-	players.append(role);
+	character_roles.remove(role);
+	new_player = Player(role);
+	players.append(new_player);
 	counter = counter + 1;
 
 count = 1;
 for i in players:
 	#player_no = i+1;
 	#player_no_string = str(player_no);
-	print("Player " + str(count) + " is the " + str(role) + "!");
+	i.playerPrint();
 	count = count + 1;
 
+#set up cities w diseases:
+random.shuffle(infectionCards);
+
+#print(infectionCards);
+
+#works - now randomized.
+#for i in infectionCards:
+#	print(i);
+
+#infection counter
+infectionCounter = 2;
+
+#num of free moves before incrementing infectionCounter w u play an epidemic card.
+numEpidemicFreeMoves = 1;
+
+#infection discard pile
+infectionDiscardPile = [];
+
+#set up diseased cities:
+for i in range(3):
+	next_city = random.choice(infectionCards);
+	infectionDiscardPile.append(next_city);
+	infectionCards.remove(next_city);
+	boardCities[next_city].numDiseaseCubes = 3;
+
+for i in range(3):
+	next_city = random.choice(infectionCards);
+	infectionDiscardPile.append(next_city);
+	infectionCards.remove(next_city);
+	boardCities[next_city].numDiseaseCubes = 2;
+
+for i in range(3):
+	next_city = random.choice(infectionCards);
+	infectionDiscardPile.append(next_city);
+	infectionCards.remove(next_city);
+	boardCities[next_city].numDiseaseCubes = 1;
+
+'''
+#print diseased Cities
+for i in boardCities:
+	if (boardCities[i].numDiseaseCubes != 0):
+		boardCities[i].startCityPrint();	
+'''
+
+
+
+#check if game is over
+gameIsOver = False;
+
+currentPlayer = 0;
+
+#play the game, next player's turn
+while (gameIsOver != True):
+
+	#print board status
+	for i in boardCities:
+		if (boardCities[i].numDiseaseCubes != 0):
+			boardCities[i].startCityPrint();	
+
+	#no. of actions remaining.
+	numActions = 3;
+	
+	#print current Player's stats:
+	print(players[currentPlayer].role + 's Turn: ');
+	players[currentPlayer].playerPrint();	
+
+
+	#do this for every action:
+	while (numActions > 0):	
+
+		#print no. actions remaining, current City status.
+		print("you have " + str(numActions) + " actions remaining");
+	
+		print("current city stats:");
+		for i in boardCities:
+			if (players[currentPlayer].position == boardCities[i].name):
+				boardCities[i].startCityPrint;
+	
+
+
+		#store available options.
+		cityOptions = [];
+
+		#print options to move to cities
+		optionIndex = 0;
+		for i in boardCities:
+			if players[currentPlayer].position in boardCities[i].neighbors:
+				print(str(optionIndex) + " - walk to " + boardCities[i].name);
+				optionIndex = optionIndex + 1;
+				cityOptions.append(boardCities[i]);
+
+		#store option to cure city.
+		for i in boardCities:
+			if (players[currentPlayer].position == boardCities[i].name and boardCities[i].numDiseaseCubes != 0):
+				print(str(optionIndex) + " - cure " + players[currentPlayer].position);
+		cityOptions.append("cure");
+
+
+		#select an option
+		playerOption = input("select an option:");	
+		nextCity = cityOptions[int(playerOption)];
+		
+		#if player wants to remove a disease cube
+		if nextCity == "cure":
+			for i in boardCities:
+				if players[currentPlayer].position == boardCities[i].name:
+					boardCities[i].numDiseaseCubes = boardCities[i].numDiseaseCubes - 1;
+					print(boardCities[i].name + " now has " + str(boardCities[i].numDiseaseCubes) + " disease cubes");	
+	
+		#if player wants to move to a different city
+		else:
+			print("you chose " + nextCity.name);
+
+			#move to city.
+			players[currentPlayer].position = nextCity.name;
+			print("moving to " + players[currentPlayer].position);
+
+		#dec num actions remainng
+		numActions = numActions - 1;
+	
+	#inc current Player, wrap around if necessary
+	currentPlayer = currentPlayer + 1;
+	if (currentPlayer >= len(players)):
+		currentPlayer = currentPlayer - len(players);
+	
+	#check if there's no disease cubes - if so, players win
+	numRemainingCubes = 0;
+	for i in boardCities:
+		numRemainingCubes = numRemainingCubes + boardCities[i].numDiseaseCubes;
+	if (numRemainingCubes == 0):
+		print("you eliminated all disease cubes - you win!");
+		gameIsOver = True;
 
 
 '''
