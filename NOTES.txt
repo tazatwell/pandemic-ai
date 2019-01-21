@@ -1,6 +1,9 @@
 Developer Notes:
 
-Updated 1.12.19:
+Updated 1.20.19:
+	Now has support for infection Cards and player Cards. At ~7.41
+
+
 
 1. Create the board game Pandemic
 	1.1 Store the map as a graph, w vertices and edges.
@@ -14,6 +17,15 @@ Updated 1.12.19:
 	6.1 Create a card class - should have isEvent bool member and name.
 7. Loop - while game is not over, do:
 	7.1 Display options - print all cities w diseases, player info, for every nearby city print an option w coresponding number.
-	7.2 If player is on a city then you can remove diseases. Medic removes all diseases.
-	7.3 At end of turn, give player 2 hand cards and draw two cards from infection deck. infect cities and add to player
+	7.3 Draw two cards from infection deck. infect cities
+	7.4 At end of every players' turn, draw 2 cards. allow fast travel to any city w card, but then delete card after.
+		7.41 If player has more than 7 cards, they need to discard at the end of their turn.
+	7.41 Code building research stations
+	7.5	Code event cards
+	7.6	Code epidemic cards - have an epidemic and infection counter. increment and track them.
+	7.7 Code cures to diseases - need 5 of same color and be in research station
+	7.8 Rt now I have a victory condition if all disease cubes on the board are taken off. This needs to be removed.
+8. Implement player abilities at the end.
+
+
 

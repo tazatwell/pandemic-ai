@@ -64,6 +64,25 @@ class Player:
 
 
 
+#Option - available actions
+class Option:
+	cure = False;
+	city = "Atlanta";
+	walk = False;
+	direct_flight = False;
+
+	#constructor
+	def __init__(self, isCure, isCity, isWalk, isCard_Flight):
+		self.cure = isCure;
+		self.city = isCity;
+		self.walk = isWalk;
+		self.direct_flight = isCard_Flight;
+
+
+
+
+
+
 #get list of cities
 citiesList = [];
 
@@ -126,6 +145,8 @@ for i in citiesList:
 
 #deck of player cards:
 playerCards = citiesList;
+random.shuffle(playerCards);
+
 
 #create list of colored cities:
 blueCities = ["San Francisco", "Chicago", "Montreal", "New York", "Atlanta", "Washington", "Madrid", "London", "Essen", "St. Petersburg", "Paris", "Milan"];
@@ -242,6 +263,9 @@ for i in boardCities:
 #check if game is over
 gameIsOver = False;
 
+#check if players won or lost
+gameWon = False;
+
 currentPlayer = 0;
 
 #play the game, next player's turn
@@ -253,7 +277,7 @@ while (gameIsOver != True):
 			boardCities[i].startCityPrint();	
 
 	#no. of actions remaining.
-	numActions = 3;
+	numActions = 4;
 	
 	#print current Player's stats:
 	print(players[currentPlayer].role + 's Turn: ');
@@ -282,37 +306,85 @@ while (gameIsOver != True):
 			if players[currentPlayer].position in boardCities[i].neighbors:
 				print(str(optionIndex) + " - walk to " + boardCities[i].name);
 				optionIndex = optionIndex + 1;
-				cityOptions.append(boardCities[i]);
+				newOption = Option(False, boardCities[i].name, True, False);
+				cityOptions.append(newOption);
 
 		#store option to cure city.
 		for i in boardCities:
 			if (players[currentPlayer].position == boardCities[i].name and boardCities[i].numDiseaseCubes != 0):
 				print(str(optionIndex) + " - cure " + players[currentPlayer].position);
-		cityOptions.append("cure");
+				optionIndex = optionIndex + 1;
+				newOption = Option(True, "Atlanta", False, False);
+				cityOptions.append(newOption);
+
+		#store options for direct flights
+		for i in players[currentPlayer].cards:
+			print(str(optionIndex) + " - direct flight to " + i);
+			newOption = Option(False, i, False, True);
+			cityOptions.append(newOption);
+			optionIndex = optionIndex + 1;
 
 
 		#select an option
 		playerOption = input("select an option:");	
-		nextCity = cityOptions[int(playerOption)];
+		nextOption = cityOptions[int(playerOption)];
 		
 		#if player wants to remove a disease cube
-		if nextCity == "cure":
+		if nextOption.cure == True:
 			for i in boardCities:
 				if players[currentPlayer].position == boardCities[i].name:
 					boardCities[i].numDiseaseCubes = boardCities[i].numDiseaseCubes - 1;
 					print(boardCities[i].name + " now has " + str(boardCities[i].numDiseaseCubes) + " disease cubes");	
 	
 		#if player wants to move to a different city
-		else:
-			print("you chose " + nextCity.name);
+		elif nextOption.walk == True:
+			print("you chose " + nextOption.city);
 
 			#move to city.
-			players[currentPlayer].position = nextCity.name;
+			players[currentPlayer].position = nextOption.city;
 			print("moving to " + players[currentPlayer].position);
+
+		#if player wants to take a direct flight
+		elif nextOption.direct_flight == True:
+			#fly to city
+			players[currentPlayer].position = nextOption.city;
+			print("flying to " + players[currentPlayer].position);
+			#delete the city card
+			for i in players[currentPlayer].cards:
+				if nextOption.city == i:
+					players[currentPlayer].cards.remove(i);
+					print("removed " + players[currentPlayer].position);
+
 
 		#dec num actions remainng
 		numActions = numActions - 1;
 	
+	#draw cards from infection deck.
+	#structure of cards: draw from beginning of infectionCards deck
+	#insert at beginning of infection discard pile
+	#did NOT code epidemics yet.
+	for i in range(infectionCounter):
+		nextInfectedCity = infectionCards.pop(0);
+		infectionDiscardPile.insert(0, nextInfectedCity);
+		for i in boardCities:
+			if boardCities[i].name == nextInfectedCity:
+				if boardCities[i].numDiseaseCubes < 3:
+					boardCities[i].numDiseaseCubes = boardCities[i].numDiseaseCubes + 1;
+					print(boardCities[i].name + " now has " + str(boardCities[i].numDiseaseCubes) + " disease cubes");
+
+	#draw cards from player cards deck. add to hand.
+	#draw from beginning of list
+	for i in range(2):
+		#if the player cards deck is empty
+		if not playerCards:
+			gameOver = True;
+			print("There are no more player cards to draw! Players lose :( ");
+			exit;
+		nextPlayerCard = playerCards.pop(0);
+		print("you drew a " + nextPlayerCard + " card");
+		players[currentPlayer].cards.append(nextPlayerCard);
+
+
 	#inc current Player, wrap around if necessary
 	currentPlayer = currentPlayer + 1;
 	if (currentPlayer >= len(players)):
@@ -325,55 +397,9 @@ while (gameIsOver != True):
 	if (numRemainingCubes == 0):
 		print("you eliminated all disease cubes - you win!");
 		gameIsOver = True;
+		gameWon = True;
 
-
-'''
-#list of edges
-#edgesList = [[0 for x in range(len(citiesList))] for y in range(len(citiesList))];
-
-#initalize all edges to 0:
-for i in range(len(citiesList)):
-	for j in range(len(citiesList)):
-		edgesList[i][j] = 0;
-
-#open file w edges
-f = open('edges.txt', 'r');
-g = open('edges.txt', 'r');
-
-#for detecting when to move to next city
-marker = "End" + '\n';
-
-#counters
-i_count = 0;
-j_count = 0;
-
-#store edges now
-#for every city
-for i in f:
-	i_count = i_count + 1;
-	#for every other city
-	for j in g:
-		j_count = j_count + 1;
-		if (i == j):
-			continue;
-		if (j == marker):
-			i = j;
-			i = next(f);
-			i_count = j_count + 1;
-			continue;
-		#then these cities have a shared edge
-		if (i_count >= len(citiesList) | j_count >= len(citiesList)):
-			print("error: i_count is " + i_count + " and j_count is " + j_count);
-			continue;
-		else:
-			edgesList[i_count][j_count] = 1;
-
-for i in citiesList:
-	for j in citiesList:
-		if (edgesList[i][j] == 1):
-			print(citiesList[i] + ' is connected to ' + citiesList[j]);
-'''
-
+	
 
 
 
