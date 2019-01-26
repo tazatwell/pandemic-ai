@@ -70,14 +70,15 @@ class Option:
 	city = "Atlanta";
 	walk = False;
 	direct_flight = False;
+	buildResearchStation = False;
 
 	#constructor
-	def __init__(self, isCure, isCity, isWalk, isCard_Flight):
+	def __init__(self, isCure, isCity, isWalk, isCard_Flight, willBuildResearchStation):
 		self.cure = isCure;
 		self.city = isCity;
 		self.walk = isWalk;
 		self.direct_flight = isCard_Flight;
-
+		self.buildResearchStation = willBuildResearchStation;
 
 
 
@@ -207,12 +208,15 @@ while (counter < numPlayers):
 	players.append(new_player);
 	counter = counter + 1;
 
+'''
 count = 1;
 for i in players:
 	#player_no = i+1;
 	#player_no_string = str(player_no);
 	i.playerPrint();
 	count = count + 1;
+'''
+
 
 #set up cities w diseases:
 random.shuffle(infectionCards);
@@ -251,6 +255,29 @@ for i in range(3):
 	infectionCards.remove(next_city);
 	boardCities[next_city].numDiseaseCubes = 1;
 
+
+#give each player their starting hand
+if numPlayers == 4:
+    numStartingHand = 2;
+elif numPlayers == 3:
+    numStartingHand = 3;
+else:
+    numStartingHand = 4;
+
+print("Drawing starting player hands");
+for i in players:
+    #print(i.role + " is drawing cards:");
+    for j in range(numStartingHand):
+        nextPlayerCard = playerCards.pop(0);
+        #print("you drew a " + nextPlayerCard + " card");
+        i.cards.append(nextPlayerCard);
+
+
+#print players' starting info
+for i in players:
+	i.playerPrint();
+
+
 '''
 #print diseased Cities
 for i in boardCities:
@@ -271,10 +298,19 @@ currentPlayer = 0;
 #play the game, next player's turn
 while (gameIsOver != True):
 
+	''' delete this after debugging starting city info
 	#print board status
 	for i in boardCities:
-		if (boardCities[i].numDiseaseCubes != 0):
+		if boardCities[i].numDiseaseCubes != 0:
 			boardCities[i].startCityPrint();	
+		elif boardCities[i].hasResearchCenter == True:
+			boardCities[i].startCityPrint();
+	'''
+	
+	#debug
+	for i in boardCities:
+		boardCities[i].startCityPrint();
+
 
 	#no. of actions remaining.
 	numActions = 4;
@@ -306,7 +342,7 @@ while (gameIsOver != True):
 			if players[currentPlayer].position in boardCities[i].neighbors:
 				print(str(optionIndex) + " - walk to " + boardCities[i].name);
 				optionIndex = optionIndex + 1;
-				newOption = Option(False, boardCities[i].name, True, False);
+				newOption = Option(False, boardCities[i].name, True, False, False);
 				cityOptions.append(newOption);
 
 		#store option to cure city.
@@ -314,15 +350,23 @@ while (gameIsOver != True):
 			if (players[currentPlayer].position == boardCities[i].name and boardCities[i].numDiseaseCubes != 0):
 				print(str(optionIndex) + " - cure " + players[currentPlayer].position);
 				optionIndex = optionIndex + 1;
-				newOption = Option(True, "Atlanta", False, False);
+				newOption = Option(True, "Atlanta", False, False, False);
 				cityOptions.append(newOption);
 
 		#store options for direct flights
 		for i in players[currentPlayer].cards:
 			print(str(optionIndex) + " - direct flight to " + i);
-			newOption = Option(False, i, False, True);
+			newOption = Option(False, i, False, True, False);
 			cityOptions.append(newOption);
 			optionIndex = optionIndex + 1;
+
+		#store option for building a research center
+		for i in players[currentPlayer].cards:
+			if i == players[currentPlayer].position:
+				print(str(optionIndex) + " - build research station in " + i);
+				newOption = Option(False, i, False, False, True);
+				cityOptions.append(newOption);
+				optionIndex = optionIndex + 1;
 
 
 		#select an option
@@ -355,6 +399,12 @@ while (gameIsOver != True):
 					players[currentPlayer].cards.remove(i);
 					print("removed " + players[currentPlayer].position);
 
+		#if player wants to build a research station
+		elif nextOption.buildResearchStation == True:
+			for i in boardCities:
+				if players[currentPlayer].position == boardCities[i].name:
+					boardCities[i].hasResearchStation = True;	
+					print("built a research station at " + boardCities[i].name);
 
 		#dec num actions remainng
 		numActions = numActions - 1;
@@ -384,6 +434,15 @@ while (gameIsOver != True):
 		print("you drew a " + nextPlayerCard + " card");
 		players[currentPlayer].cards.append(nextPlayerCard);
 
+	#if the player has more than 7 cards, discard cards until he/she has 7. 
+	while (len(players[currentPlayer].cards) > 7):
+		print("you have more than 7 cards - discard until you get to 7.");
+		for i in range(len(players[currentPlayer].cards)):
+			print("\t" + str(i) + " - " + players[currentPlayer].cards[i]);
+		discardOption = int(input("Select a number to discard:")); 
+		discardCard = players[currentPlayer].cards[discardOption];
+		players[currentPlayer].cards.remove(discardCard);	
+		print("you discarded your " + discardCard + " card");
 
 	#inc current Player, wrap around if necessary
 	currentPlayer = currentPlayer + 1;
