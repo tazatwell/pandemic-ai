@@ -6,6 +6,7 @@ Updated 1.20.19:
 	going to experiment w the PyCharm IDE (heard it has a graphical debugger).
 
 
+0. added my id_rsa key to automate credential authentication
 1. Create the board game Pandemic
 	1.1 Store the map as a graph, w vertices and edges.
 	1.2 Store the player deck and infection deck using an array.
