@@ -5,7 +5,7 @@ Updated 1.28.19:
 	Working on building research stations
 	going to experiment w the PyCharm IDE (heard it has a graphical debugger).
 	Working on configuring unit testing w Travis CI
-
+		Need to re-write code into functions for writing easier python tests
 
 0. added my id_rsa key to automate credential authentication
 	0.1	Using credential storer to store keys
