@@ -4,7 +4,6 @@ bs4==0.0.1
 certifi==2018.10.15
 chardet==3.0.4
 cryptography==2.1.4
-duplicity==0.7.17
 enum34==1.1.6
 fasteners==0.12.0
 html2text==2018.1.9
