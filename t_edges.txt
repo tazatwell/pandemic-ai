@@ -1,0 +1,32 @@
+San Francisco - Chicago
+San Francisco - Los Angeles
+Chicago - San Francisco
+Chicago - Montreal
+Chicago - Atlanta
+Chicago - Mexico City
+Chicago - Los Angeles
+Montreal - Chicago
+Atlanta - Miami
+Atlanta - Chicago
+Los Angeles - San Francisco
+Los Angeles - Chicago
+Los Angeles - Mexico City
+Miami - Bogota
+Miami - Mexico City
+Miami - Atlanta
+Mexico City - Chicago
+Mexico City - Miami
+Mexico City - Bogota
+Mexico City - Los Angeles
+Bogota - Mexico City
+Bogota - Miami
+Riyadh - Baghdad
+Baghdad - Riyadh
+Beijing - Shanghai
+Shanghai - Beijing
+Shanghai - Hong Kong
+Shanghai - Taipei
+Hong Kong - Shanghai
+Hong Kong - Taipei
+Taipei - Shanghai
+Taipei - Hong Kong

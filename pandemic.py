@@ -87,9 +87,9 @@ def main():
 
 
 #create list of cities
-def create_cities():
+def create_cities(filename):
 	citiesList = [];
-	f = open('cities.txt', 'r');
+	f = open(filename, 'r');
 	for i in f:
 		newCity = i[0:-1];
 		citiesList.append(newCity);
@@ -127,7 +127,7 @@ def create_edges(citiesList):
 #play game
 def play_pandemic():
 
-	citiesList = create_cities();
+	citiesList = create_cities('cities.txt');
 
 	edgesList = create_edges(citiesList);
 
@@ -469,6 +469,6 @@ def play_pandemic():
 	return;		
 
 
-main();
+#main();
 
 
