@@ -1,12 +1,10 @@
 Developer Notes:
 
-Updated 1.30.19:
-	Now has support for infection Cards and player Cards, and starting hand. At ~7.43
-	Working on building research stations
-	going to experiment w the PyCharm IDE (heard it has a graphical debugger).
-	Working on configuring unit testing w Travis CI
-		Need to re-write code into functions for writing easier python tests
-	Wrote test fn for create_cities fn, now going to see if I can integrate it with code coverage
+Updated 2.23.19:
+	Now has allows traveling through research stations. On ~7.5.
+	Working on building epidemic cards and the epidemic counter.
+	No need to write unit tests or test for code coverage - producing test cases is very difficult.
+
 
 
 0. added my id_rsa key to automate credential authentication
@@ -30,11 +28,13 @@ Updated 1.30.19:
 		7.43	Code building research stations
 		7.431 Delete player card if he/she wants to build a research station
 		7.44 Allow option to travel between cities with research stations
-	7.5	Code epidemic cards - have an epidemic and infection counter. increment and track them.
+	7.5	Code epidemic cards - have an epidemic counter and 'free Epidemic' tracker.
+	7.7 Code outbreaks and outbreak tracker
 	7.6	Code event cards
 	7.7 Code cures to diseases - need 5 of same color and be in research station
 	7.8 Rt now I have a victory condition if all disease cubes on the board are taken off. This needs to be removed.
 8. Implement player abilities at the end.
 9. Only discard cards at the end of the player's turn, i.e. if player receives a card and now has 8, he/she doesn't discard until the end of his/her turn
 10. Implement trading cards
-
+11. Code difficulties - easy is 3/4, medium is 5, brave is 6
+12. Build an AI to solve this game.

@@ -72,14 +72,16 @@ class Option:
 	walk = False;
 	direct_flight = False;
 	buildResearchStation = False;
+	teleportBetweenStations = False;
 
 	#constructor
-	def __init__(self, isCure, isCity, isWalk, isCard_Flight, willBuildResearchStation):
+	def __init__(self, isCure, isCity, isWalk, isCard_Flight, willBuildResearchStation, willTeleport):
 		self.cure = isCure;
 		self.city = isCity;
 		self.walk = isWalk;
 		self.direct_flight = isCard_Flight;
 		self.buildResearchStation = willBuildResearchStation;
+		self.teleportBetweenStations = willTeleport;
 
 #main 
 def main():
@@ -350,7 +352,7 @@ def play_pandemic():
 				if players[currentPlayer].position in boardCities[i].neighbors:
 					print(str(optionIndex) + " - walk to " + boardCities[i].name);
 					optionIndex = optionIndex + 1;
-					newOption = Option(False, boardCities[i].name, True, False, False);
+					newOption = Option(False, boardCities[i].name, True, False, False, False);
 					cityOptions.append(newOption);
 
 			#store option to cure city.
@@ -358,13 +360,13 @@ def play_pandemic():
 				if (players[currentPlayer].position == boardCities[i].name and boardCities[i].numDiseaseCubes != 0):
 					print(str(optionIndex) + " - cure " + players[currentPlayer].position);
 					optionIndex = optionIndex + 1;
-					newOption = Option(True, "Atlanta", False, False, False);
+					newOption = Option(True, "Atlanta", False, False, False, False);
 					cityOptions.append(newOption);
 
 			#store options for direct flights
 			for i in players[currentPlayer].cards:
 				print(str(optionIndex) + " - direct flight to " + i);
-				newOption = Option(False, i, False, True, False);
+				newOption = Option(False, i, False, True, False, False);
 				cityOptions.append(newOption);
 				optionIndex = optionIndex + 1;
 
@@ -372,10 +374,18 @@ def play_pandemic():
 			for i in players[currentPlayer].cards:
 				if i == players[currentPlayer].position:
 					print(str(optionIndex) + " - build research station in " + i);
-					newOption = Option(False, i, False, False, True);
+					newOption = Option(False, i, False, False, True, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
 
+			#store options for teleporting a research center
+			if boardCities[players[currentPlayer].position].hasResearchCenter == "true":
+				for i in boardCities:
+					if boardCities[i].hasResearchCenter == "true" and i != players[currentPlayer].position:
+						print(str(optionIndex) + " teleport to " + i + " via Research Station");
+						newOption = Option(False, i, False, False, False, True);
+						cityOptions.append(newOption);
+						optionIndex = optionIndex + 1;
 
 			#select an option
 			playerOption = input("select an option:");	
@@ -411,8 +421,17 @@ def play_pandemic():
 			elif nextOption.buildResearchStation == True:
 				for i in boardCities:
 					if players[currentPlayer].position == boardCities[i].name:
-						boardCities[i].hasResearchStation = True;	
+						boardCities[i].hasResearchCenter = "true";
 						print("built a research station at " + boardCities[i].name);
+				#remove player's card
+				for i in players[currentPlayer].cards:
+					if i == nextOption.city:
+						players[currentPlayer].cards.remove(i);
+						print("removed " + players[currentPlayer].position);
+
+			#if player wants to teleport between stations
+			elif nextOption.teleportBetweenStations == True:
+				players[currentPlayer].position = nextOption.city;
 
 			#dec num actions remainng
 			numActions = numActions - 1;
@@ -469,6 +488,6 @@ def play_pandemic():
 	return;		
 
 
-#main();
+main();
 
 
