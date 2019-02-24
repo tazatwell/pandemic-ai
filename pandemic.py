@@ -127,6 +127,7 @@ def create_edges(citiesList):
 
 
 #play game
+#until difficulties are implemented, 
 def play_pandemic():
 
 	citiesList = create_cities('cities.txt');
