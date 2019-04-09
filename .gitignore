@@ -2,3 +2,5 @@ __pycache__
 .coverage
 Test_values.pyc
 pandemic.pyc
+UPDATES.txt
+NOTES.txt
