@@ -387,12 +387,10 @@ def play_pandemic():
 
 	#between dealing starting hands and putting in epidemics, we'll insert the
 	#event cards.
-	#NOTE - we put the ONE QUIET EVENT card on top for testing.
 	for i in eventCardList:
-		if i != "FORECAST":
-			playerCards.append(i);
+		playerCards.append(i);
 	random.shuffle(playerCards);
-	playerCards.insert(0, "FORECAST");
+	#playerCards.insert(0, "FORECAST");
 
 
 	#ok, so NOW we put in the epidemic cards
@@ -569,8 +567,11 @@ def play_pandemic():
 				for i in players[currentPlayer].cards:
 					if i in blueCities:
 						numBlueCards = numBlueCards + 1;
+					elif i in yellowCities:
 						numYellowCards = numYellowCards + 1;
+					elif i in blackCities:
 						numBlackCards = numBlackCards + 1;
+					elif i in redCities:
 						numRedCards = numRedCards + 1;
 				if numBlueCards >= 5:
 					print(str(optionIndex) + " - cure BLUE disease");
@@ -642,10 +643,13 @@ def play_pandemic():
 
 			#if player wants to use an event Card
 			elif nextOption.useEvent == True:
-				#print("playing one quiet night card.");
+
+				#ONE QUIET NIGHT
 				if nextOption.city == "ONE QUIET NIGHT":
 					print("identified card as ONE QUEIT NIGHT. skipInfections is now true.");
 					skipInfections = True;
+
+				#GOVERNMENT GRANT
 				elif nextOption.city == "GOVERNMENT GRANT":
 					#print("not the one quiet night card tho...");
 					print("identified card as government grant.");
@@ -700,51 +704,70 @@ def play_pandemic():
 						forecast_pile.remove(forecast_pile[forecast_choice]);
 						infectionCards.insert(0, nextInfectionCard);
 
-				#To cure diseases
-				elif nextOption.cureBlue == True:
-					removeBlue = 0;
-					while removeBlue < 5:
-						for i in players[currentPlayer].cards:
-							if i in blueCities:
-								players[currentPlayer].cards.remove(i);
-								removeBlue = removeBlue + 1;
-					curedBlue = True;
-					numCuredDiseases = numCuredDiseases + 1;
-					if numCuredDiseases == 4:
-						print("Players discovered cures for all 4 diseases! Game Won!");
-				elif nextOption.cureYellow == True:
-					removeYellow = 0;
-					while removeYellow < 5:
-						for i in players[currentPlayer].cards:
-							if i in yellowCities:
-								players[currentPlayer].cards.remove(i);
-								removeYellow = removeYellow + 1;
-					curedYellow = True;
-					numCuredDiseases = numCuredDiseases + 1;
-					if numCuredDiseases == 4:
-						print("Players discovered cures for all 4 diseases! Game Won!");
-				elif nextOption.cureBlack == True:
-					removeBlack = 0;
-					while removeBlack < 5:
-						for i in players[currentPlayer].cards:
-							if i in BlackCities:
-								players[currentPlayer].cards.remove(i);
-								removeBlack = removeBlack + 1;
-					curedBlack = True;
-					numCuredDiseases = numCuredDiseases + 1;
-					if numCuredDiseases == 4:
-						print("Players discovered cures for all 4 diseases! Game Won!");
-				elif nextOption.cureRed == True:
-					removeRed = 0;
-					while removeRed < 5:
-						for i in players[currentPlayer].cards:
-							if i in RedCities:
-								players[currentPlayer].cards.remove(i);
-								removeRed = removeRed + 1;	
-					curedRed = True;
-					numCuredDiseases = numCuredDiseases + 1;
-					if numCuredDiseases == 4:
-						print("Players discovered cures for all 4 diseases! Game Won!");
+			#To cure diseases
+			#cure blue disease
+			elif nextOption.cureBlue == True:
+				print("curing blue disease");
+				#discard 5 blue cards
+				removeBlue = 0;
+				for i in players[currentPlayer].cards:
+					if i in blueCities and removeBlue < 6:
+						print("removing " + i + " card");
+						players[currentPlayer].cards.remove(i);
+						removeBlue = removeBlue + 1;
+				curedBlue = True;
+				numCuredDiseases = numCuredDiseases + 1;
+				#check victory condition
+				if numCuredDiseases == 4:
+					print("Players discovered cures for all 4 diseases! Game Won!");
+
+			#cure yellow disease
+			elif nextOption.cureYellow == True:
+				print("curing yellow disease");
+				#discard 5 yellow cards
+				removeYellow = 0;
+				for i in players[currentPlayer].cards:
+					if i in yellowCities and removeYellow < 6:
+						print("removing " + i + " card");
+						players[currentPlayer].cards.remove(i);
+						removeYellow = removeYellow + 1;
+				curedYellow = True;
+				numCuredDiseases = numCuredDiseases + 1;
+				#check victory condition
+				if numCuredDiseases == 4:
+					print("Players discovered cures for all 4 diseases! Game Won!");
+
+			#cure black disease
+			elif nextOption.cureBlack == True:
+				print("curing black disease");
+				#discard 5 black cards
+				removeBlack = 0;
+				for i in players[currentPlayer].cards:
+					if i in blackCities and removeBlack < 6:
+						print("removing " + i + " card");
+						players[currentPlayer].cards.remove(i);
+						removeBlack = removeBlack + 1;
+				curedBlack = True;
+				numCuredDiseases = numCuredDiseases + 1;
+				#check victory condition
+				if numCuredDiseases == 4:
+					print("Players discovered cures for all 4 diseases! Game Won!");
+
+			#cure red disease
+			elif nextOption.cureRed == True:
+				print("curing red disease");
+				#discard 5 red cards
+				removeRed = 0;
+				for i in players[currentPlayer].cards:
+					if i in redCities and removeRed < 6:
+						print("removing " + i + " card");
+						players[currentPlayer].cards.remove(i);
+						removeRed = removeRed + 1;
+				curedRed = True;
+				numCuredDiseases = numCuredDiseases + 1;
+				#check victory condition
+				if numCuredDiseases == 4:
+					print("Players discovered cures for all 4 diseases! Game Won!");
 
 
 
@@ -848,7 +871,16 @@ def play_pandemic():
 		while (len(players[currentPlayer].cards) > 7):
 			print("you have more than 7 cards - discard until you get to 7.");
 			for i in range(len(players[currentPlayer].cards)):
-				print("\t" + str(i) + " - " + players[currentPlayer].cards[i]);
+				if players[currentPlayer].cards[i] in blueCities:
+					print("\t" + str(i) + " - " + players[currentPlayer].cards[i] + " - BLUE");
+				elif players[currentPlayer].cards[i] in yellowCities:
+					print("\t" + str(i) + " - " + players[currentPlayer].cards[i] + " - YELLOW");
+				elif players[currentPlayer].cards[i] in blackCities:
+					print("\t" + str(i) + " - " + players[currentPlayer].cards[i] + " - BLACK");
+				elif players[currentPlayer].cards[i] in redCities:
+					print("\t" + str(i) + " - " + players[currentPlayer].cards[i] + " - RED");
+				else:
+					print("\t" + str(i) + " - " + players[currentPlayer].cards[i]);
 			discardOption = int(input("Select a number to discard:")); 
 			discardCard = players[currentPlayer].cards[discardOption];
 			players[currentPlayer].cards.remove(discardCard);	
