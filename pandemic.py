@@ -99,10 +99,13 @@ class Option:
 	cureYellow = False;
 	cureBlack = False;
 	cureRed = False;
+	trade = False;
+	tradeCard = "Atlanta";
+	tradePartner = -1;
+	tradeGive = False;
 
 	#constructor
-	def __init__(self, isCure, isCity, isWalk, isCard_Flight, willBuildResearchStation, willTeleport, willUseEvent, willCureBlue, willCureYellow, 
-	willCureBlack, willCureRed):
+	def __init__(self, isCure, isCity, isWalk, isCard_Flight, willBuildResearchStation, willTeleport, willUseEvent, willCureBlue, willCureYellow, willCureBlack, willCureRed, willTrade, willTradeCard, willTradePartner, willTradeGive):
 		self.cure = isCure;
 		self.city = isCity;
 		self.walk = isWalk;
@@ -114,6 +117,10 @@ class Option:
 		self.cureYellow = willCureYellow;
 		self.cureBlack = willCureBlack;
 		self.cureRed = willCureRed;
+		self.trade = willTrade;
+		self.tradeCard = willTradeCard;
+		self.tradePartner = willTradePartner;
+		self.tradeGive = willTradeGive;
 
 '''
 #Card - whether Card is an Event or a City Card
@@ -375,6 +382,10 @@ def play_pandemic():
 	else:
 			numStartingHand = 4;
 
+	#debug - test if trading works
+	#uncomment this if trading works
+	playerCards.insert(0, "Atlanta");
+
 	print("Drawing starting player hands");
 	for i in players:
 			#print(i.role + " is drawing cards:");
@@ -390,7 +401,6 @@ def play_pandemic():
 	for i in eventCardList:
 		playerCards.append(i);
 	random.shuffle(playerCards);
-	#playerCards.insert(0, "FORECAST");
 
 
 	#ok, so NOW we put in the epidemic cards
@@ -463,6 +473,9 @@ def play_pandemic():
 	blackCured = False;
 	redCured = False;
 
+	#check if trade works - comment this later
+	#playerCards.insert(0, "Atlanta");
+
 
 	#play the game, next player's turn
 	while (gameIsOver != True):
@@ -508,13 +521,13 @@ def play_pandemic():
 			#store available options.
 			cityOptions = [];
 
-			#print options to move to cities
+			#print options to walk to nearby cities
 			optionIndex = 0;
 			for i in boardCities:
 				if players[currentPlayer].position in boardCities[i].neighbors:
 					print(str(optionIndex) + " - walk to " + boardCities[i].name);
 					optionIndex = optionIndex + 1;
-					newOption = Option(False, boardCities[i].name, True, False, False, False, False, False, False, False, False);
+					newOption = Option(False, boardCities[i].name, True, False, False, False, False, False, False, False, False, False, "Atlanta", -1, False);
 					cityOptions.append(newOption);
 
 			#store option to cure city.
@@ -522,14 +535,14 @@ def play_pandemic():
 				if (players[currentPlayer].position == boardCities[i].name and boardCities[i].numDiseaseCubes != 0):
 					print(str(optionIndex) + " - cure " + players[currentPlayer].position);
 					optionIndex = optionIndex + 1;
-					newOption = Option(True, "Atlanta", False, False, False, False, False, False, False, False, False);
+					newOption = Option(True, "Atlanta", False, False, False, False, False, False, False, False, False, False, "Atlanta", -1, False);
 					cityOptions.append(newOption);
 
 			#store options for direct flights
 			for i in players[currentPlayer].cards:
 				if i not in eventCardList:
 					print(str(optionIndex) + " - direct flight to " + i);
-					newOption = Option(False, i, False, True, False, False, False, False, False, False, False);
+					newOption = Option(False, i, False, True, False, False, False, False, False, False, False, False, "Atlanta", -1, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
 
@@ -537,7 +550,7 @@ def play_pandemic():
 			for i in players[currentPlayer].cards:
 				if i == players[currentPlayer].position:
 					print(str(optionIndex) + " - build research station in " + i);
-					newOption = Option(False, i, False, False, True, False, False, False, False, False, False);
+					newOption = Option(False, i, False, False, True, False, False, False, False, False, False, False, "Atlanta", -1, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
 
@@ -546,7 +559,7 @@ def play_pandemic():
 				for i in boardCities:
 					if boardCities[i].hasResearchCenter == "true" and i != players[currentPlayer].position:
 						print(str(optionIndex) + " teleport to " + i + " via Research Station");
-						newOption = Option(False, i, False, False, False, True, False, False, False, False, False);
+						newOption = Option(False, i, False, False, False, True, False, False, False, False, False, False, "Atlanta", -1, False);
 						cityOptions.append(newOption);
 						optionIndex = optionIndex + 1;
 
@@ -554,11 +567,12 @@ def play_pandemic():
 			for i in players[currentPlayer].cards:
 				if i in eventCardList:
 					print(str(optionIndex) + " - use " + i + " event card.");
-					newOption = Option(False, i, False, False, False, False, True, False, False, False, False);
+					newOption = Option(False, i, False, False, False, False, True, False, False, False, False, False, "Atlanta", -1, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;		
 	
 			#store options for curing diseases
+			#if player is DOCTOR, only needs 4 cards of same color
 			if boardCities[players[currentPlayer].position].hasResearchCenter == "true":
 				numBlueCards = 0;
 				numYellowCards = 0;
@@ -573,44 +587,71 @@ def play_pandemic():
 						numBlackCards = numBlackCards + 1;
 					elif i in redCities:
 						numRedCards = numRedCards + 1;
-				if numBlueCards >= 5:
+				if numBlueCards >= 5 or (numBlueCards == 4 and players[currentPlayer].role == "Scientist"):
 					print(str(optionIndex) + " - cure BLUE disease");
-					newOption = Option(False, i, False, False, False, False, False, True, False, False, False);
+					newOption = Option(False, i, False, False, False, False, False, True, False, False, False, False, "Atlanta", -1, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
-				if numYellowCards >= 5:
+				if numYellowCards >= 5 or (numYellowCards == 4 and players[currentPlayer].role == "Scientist"):
 					print(str(optionIndex) + " - cure YELLOW disease");
-					newOption = Option(False, i, False, False, False, False, False, False, True, False, False);
+					newOption = Option(False, i, False, False, False, False, False, False, True, False, False, False, "Atlanta", -1, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
-				if numBlackCards >= 5:
+				if numBlackCards >= 5 or (numBlackCards == 4 and players[currentPlayer].role == "Scientist"):
 					print(str(optionIndex) + " - cure BLACK disease");
-					newOption = Option(False, i, False, False, False, False, False, False, False, True, False);
+					newOption = Option(False, i, False, False, False, False, False, False, False, True, False, False, "Atlanta", -1, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
-				if numRedCards >= 5:
+				if numRedCards >= 5 or (numRedCards == 4 and players[currentPlayer].role == "Scientist"):
 					print(str(optionIndex) + " - cure RED disease");
-					newOption = Option(False, i, False, False, False, False, False, False, False, False, True);
+					newOption = Option(False, i, False, False, False, False, False, False, False, False, True, False, "Atlanta", -1, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
-				
+			
+			#store options for trading cards
+			for i in range(numPlayers):
+				if i == currentPlayer:
+					continue;
+				if players[i].position == players[currentPlayer].position:
+					for j in players[i].cards:
+						if j == players[i].position:
+							print(str(optionIndex) + " - take " + j + " card from player " + str(i) + " - " + players[i].role);
+							newOption = Option(False, i, False, False, False, False, False, False, False, False, False, True, j, i, False);
+							cityOptions.append(newOption);
+							optionIndex = optionIndex + 1;
+					for j in players[currentPlayer].cards:
+						if j == players[i].position:
+							print(str(optionIndex) + " - give " + j + " card to player " + str(i) + " - " + players[i].role);
+							newOption = Option(False, i, False, False, False, False, False, False, False, False, False, True, j, i, True);
+							cityOptions.append(newOption);
+							optionIndex = optionIndex + 1;
+	
 
 			#select an option
 			playerOption = input("select an option:");	
 			nextOption = cityOptions[int(playerOption)];
-			
+			if nextOption.cureBlue == True or nextOption.cureYellow == True or nextOption.cureBlack == True or nextOption.cureRed == True:
+				print("curing a disease!");		
+	
 			#if player wants to remove a disease cube
 			if nextOption.cure == True:
 				for i in boardCities:
 					if players[currentPlayer].position == boardCities[i].name:
-						boardCities[i].numDiseaseCubes = boardCities[i].numDiseaseCubes - 1;
-						print(boardCities[i].name + " now has " + str(boardCities[i].numDiseaseCubes) + " disease cubes");	
+						if players[currentPlayer].position in blueCities and blueCured == True:
+							boardCities[i].numDiseaseCubes = 0;
+						elif players[currentPlayer].position in yellowCities and yellowCured == True:
+							boardCities[i].numDiseaseCubes = 0;
+						elif players[currentPlayer].position in blackCities and blackCured == True:
+							boardCities[i].numDiseaseCubes = 0;
+						elif players[currentPlayer].position in redCities and redCured == True:
+							boardCities[i].numDiseaseCubes = 0;
+						else:
+							boardCities[i].numDiseaseCubes = boardCities[i].numDiseaseCubes - 1;
+						print(boardCities[i].name + " now has " + str(boardCities[i].numDiseaseCubes) + " disease cubes");
 		
-			#if player wants to move to a different city
+			#if player wants to walk to nearby city
 			elif nextOption.walk == True:
 				print("you chose " + nextOption.city);
-
-				#move to city.
 				players[currentPlayer].position = nextOption.city;
 				print("moving to " + players[currentPlayer].position);
 
@@ -622,6 +663,7 @@ def play_pandemic():
 				#delete the city card
 				for i in players[currentPlayer].cards:
 					if nextOption.city == i:
+						playerDiscardPile.insert(0, i);
 						players[currentPlayer].cards.remove(i);
 						print("removed " + players[currentPlayer].position);
 
@@ -634,6 +676,7 @@ def play_pandemic():
 				#remove player's card
 				for i in players[currentPlayer].cards:
 					if i == nextOption.city:
+						playerDiscardPile.insert(0, i);
 						players[currentPlayer].cards.remove(i);
 						print("removed " + players[currentPlayer].position);
 
@@ -643,13 +686,10 @@ def play_pandemic():
 
 			#if player wants to use an event Card
 			elif nextOption.useEvent == True:
-
-				#ONE QUIET NIGHT
+				#print("playing one quiet night card.");
 				if nextOption.city == "ONE QUIET NIGHT":
 					print("identified card as ONE QUEIT NIGHT. skipInfections is now true.");
 					skipInfections = True;
-
-				#GOVERNMENT GRANT
 				elif nextOption.city == "GOVERNMENT GRANT":
 					#print("not the one quiet night card tho...");
 					print("identified card as government grant.");
@@ -704,78 +744,103 @@ def play_pandemic():
 						forecast_pile.remove(forecast_pile[forecast_choice]);
 						infectionCards.insert(0, nextInfectionCard);
 
+				#delete the event card
+				for i in players[currentPlayer].cards:
+					if nextOption.city == i:
+						playerCardDiscardPile.insert(0, i);
+						players[currentPlayer].cards.remove(i);
+				
+				#event cards dont take up an action
+				numActions = numActions + 1;		
+	
+
 			#To cure diseases
 			#cure blue disease
 			elif nextOption.cureBlue == True:
 				print("curing blue disease");
-				#discard 5 blue cards
 				removeBlue = 0;
+				removeList = [];
 				for i in players[currentPlayer].cards:
-					if i in blueCities and removeBlue < 6:
-						print("removing " + i + " card");
-						players[currentPlayer].cards.remove(i);
+					if i in blueCities and removeBlue < 5:
+						removeList.append(i);
 						removeBlue = removeBlue + 1;
-				curedBlue = True;
+				for i in removeList:
+					playerCardDiscardPile.insert(0, i);
+					players[currentPlayer].cards.remove(i);
+				blueCured = True;
 				numCuredDiseases = numCuredDiseases + 1;
-				#check victory condition
 				if numCuredDiseases == 4:
 					print("Players discovered cures for all 4 diseases! Game Won!");
 
 			#cure yellow disease
 			elif nextOption.cureYellow == True:
 				print("curing yellow disease");
-				#discard 5 yellow cards
 				removeYellow = 0;
+				removeList = [];
 				for i in players[currentPlayer].cards:
-					if i in yellowCities and removeYellow < 6:
-						print("removing " + i + " card");
-						players[currentPlayer].cards.remove(i);
+					if i in yellowCities and removeYellow < 5:
+						removeList.append(i);
 						removeYellow = removeYellow + 1;
-				curedYellow = True;
+				for i in removeList:
+					playerCardDiscardPile.insert(0, i);
+					players[currentPlayer].cards.remove(i);
+				yellowCured = True;
 				numCuredDiseases = numCuredDiseases + 1;
-				#check victory condition
 				if numCuredDiseases == 4:
 					print("Players discovered cures for all 4 diseases! Game Won!");
-
+			
 			#cure black disease
 			elif nextOption.cureBlack == True:
-				print("curing black disease");
-				#discard 5 black cards
+				print("curing black disease.");
 				removeBlack = 0;
+				removeList = [];
 				for i in players[currentPlayer].cards:
-					if i in blackCities and removeBlack < 6:
-						print("removing " + i + " card");
-						players[currentPlayer].cards.remove(i);
+					if i in blackCities and removeBlack < 5:
+						removeList.append(i);
 						removeBlack = removeBlack + 1;
-				curedBlack = True;
+				for i in removeList:
+					playerCardDiscardPile.insert(0, i);
+					players[currentPlayer].cards.remove(i);
+				blackCured = True;
 				numCuredDiseases = numCuredDiseases + 1;
-				#check victory condition
 				if numCuredDiseases == 4:
 					print("Players discovered cures for all 4 diseases! Game Won!");
 
 			#cure red disease
 			elif nextOption.cureRed == True:
 				print("curing red disease");
-				#discard 5 red cards
 				removeRed = 0;
+				removeList = [];
 				for i in players[currentPlayer].cards:
-					if i in redCities and removeRed < 6:
-						print("removing " + i + " card");
-						players[currentPlayer].cards.remove(i);
+					if i in redCities and removeRed < 5:
+						removeList.append(i);
 						removeRed = removeRed + 1;
-				curedRed = True;
+				for i in removeList:
+					playerCardDiscardPile.insert(0, i);
+					players[currentPlayer].cards.remove(i);
+				redCured = True;
 				numCuredDiseases = numCuredDiseases + 1;
-				#check victory condition
 				if numCuredDiseases == 4:
 					print("Players discovered cures for all 4 diseases! Game Won!");
 
+			#if player wants to trade
+			elif nextOption.trade == True:
+				#if player wants to give card to another player
+				if nextOption.tradeGive == True:
+					players[nextOption.tradePartner].cards.insert(0, nextOption.tradeCard);
+					players[currentPlayer].cards.remove(nextOption.tradeCard);
+				#if player wants to take a card from another player
+				elif nextOption.tradeGive == False:
+					players[currentPlayer].cards.insert(0, nextOption.tradeCard);
+					players[nextOption.tradePartner].cards.remove(nextOption.tradeCard);
 
 
-	
+				'''	
 				for i in players[currentPlayer].cards:
 					if nextOption.city == i:
 						players[currentPlayer].cards.remove(i);
-	
+				'''	
+
 
 			#dec num actions remainng
 			numActions = numActions - 1;
@@ -891,6 +956,8 @@ def play_pandemic():
 		if (currentPlayer >= len(players)):
 			currentPlayer = currentPlayer - len(players);
 		
+		'''
+		#this should be removed - only useful for early version of game
 		#check if there's no disease cubes - if so, players win
 		numRemainingCubes = 0;
 		for i in boardCities:
@@ -899,6 +966,7 @@ def play_pandemic():
 			print("you eliminated all disease cubes - you win!");
 			gameIsOver = True;
 			gameWon = True;
+		'''	
 
 	return;		
 
