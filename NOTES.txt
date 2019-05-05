@@ -1,12 +1,5 @@
 Developer Notes:
 
-<<<<<<< HEAD
-Updated 2.23.19:
-	Now has allows traveling through research stations. On ~7.5.
-	Working on building epidemic cards and the epidemic counter.
-	No need to write unit tests or test for code coverage - producing test cases is very difficult.
-
-=======
 
 Updated 4.10 - Had to git reset bc I accidentally rm'd my notes file. Now deletes cards correctly after cure.
 	Working on allowing cures to remove ALL disease cubes off of a boad.
@@ -14,7 +7,6 @@ Updated 4.10 - Had to git reset bc I accidentally rm'd my notes file. Now delete
 Updated 4.2 - Now on 7.6
 	Now performs outbreaks correctly, and quits game immediately after 8th outbreak.
 	Working on coding the outbreaks, currently debugging ONE QUIET NIGHT card.
->>>>>>> 294b03a (added cures to diseases. Removes cured disease cubes properly once cure for disease is discovered. Now supports trading cards. Working on player abilities - Scientist, and allowing players to choose their role)
 
 
 0. added my id_rsa key to automate credential authentication
@@ -45,12 +37,6 @@ Updated 4.2 - Now on 7.6
 	7.6	Code event cards
 	7.7 Code cures to diseases - need 5 of same color and be in research station
 	7.8 Rt now I have a victory condition if all disease cubes on the board are taken off. This needs to be removed.
-<<<<<<< HEAD
-8. Implement player abilities at the end.
-9. Only discard cards at the end of the player's turn, i.e. if player receives a card and now has 8, he/she doesn't discard until the end of his/her turn
-10. Implement trading cards
-11. Code difficulties - easy is 3/4, medium is 5, brave is 6
-=======
 	7.9 Add discard pile for player cards
 	7.10 Add support for colored disease cubes, decrement properly, and if no. of disease cubes for any color is 0, players lose.
 9. Only discard cards at the end of the player's turn, i.e. if player receives a card and now has 8, he/she doesn't discard until the end of his/her turn
@@ -59,6 +45,20 @@ Updated 4.2 - Now on 7.6
 11/0. Implement player abilities
 	11/0.1 To test this, ask player which role he/she wants to be.
 11. Code difficulties - easy is 4, medium is 5, brave is 6
->>>>>>> 294b03a (added cures to diseases. Removes cured disease cubes properly once cure for disease is discovered. Now supports trading cards. Working on player abilities - Scientist, and allowing players to choose their role)
 12. There should be a global limit on how many disease cubes are on the board?
-13. Build an AI to solve this game.
+	12.1 If city already has research station, you can't build one
+13. Add code style guidelines on comments, spacing, no. of chars per line, trailing white spaces. Refactor.
+	13.1 Make no. of disease cubes on city a global const.
+14. Make a public release, and make this repo public.
+15. Build an AI to solve this game.
+16. Test the performance of different AI constructed using different models
+	16.1 Data Analysis w R?
+	16.2 See which models perform better w/ 4 epidemic cards, 5, 6, 7, 8, ... and see what the stopping point is (even AI can't win)
+	16.3 See which models require the least no. of games to win
+	16.4 Try changing the no. of moves / turn, see how data differs.
+	16.5 Create a new graph algorithms based on custom-created node weight and finding most efficent path that Medic should take to cure most disease
+		cubes.
+		16.51 A direct flight is like a connection from dest. city to every other city. There are edges between all cities that have a research station
+			(like a dense graph).
+		16.52 Need to create a value for weight of nodes: based on no. of disease cubes on city, no. of nieghbors, and no. of disease cubes on neighbors
+17. Contact Matt Leacock, CDC (center for disease control), Center for Study of Existential Risk, Nick Bostrom :), Data Structures Professors.

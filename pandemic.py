@@ -14,7 +14,6 @@ redCities = ["Beijing", "Seoul", "Shanghai", "Tokyo", "Hong Kong", "Taipei", "Os
 
 
 
-
 #edge class:
 class Edge:
 	start = "San Francisco";
@@ -46,7 +45,7 @@ class City:
 		print("City - " + self.name);
 		print("\t" + "color: " + self.color);
 		print("\t" + str(self.numDiseaseCubes) + " disease cubes");
-		print("\t" + "research center - " + self.hasResearchCenter);
+		print("\t" + "research center - " + str(self.hasResearchCenter));
 		#if (self.hasResearchCenter == True):
 		#	print("\t" + "has research center");
 		#elif (self.hasResearchCenter == False):
@@ -103,9 +102,10 @@ class Option:
 	tradeCard = "Atlanta";
 	tradePartner = -1;
 	tradeGive = False;
+	opExpJump = False
 
 	#constructor
-	def __init__(self, isCure, isCity, isWalk, isCard_Flight, willBuildResearchStation, willTeleport, willUseEvent, willCureBlue, willCureYellow, willCureBlack, willCureRed, willTrade, willTradeCard, willTradePartner, willTradeGive):
+	def __init__(self, isCure, isCity, isWalk, isCard_Flight, willBuildResearchStation, willTeleport, willUseEvent, willCureBlue, willCureYellow, willCureBlack, willCureRed, willTrade, willTradeCard, willTradePartner, willTradeGive, willOpExpJump):
 		self.cure = isCure;
 		self.city = isCity;
 		self.walk = isWalk;
@@ -121,6 +121,7 @@ class Option:
 		self.tradeCard = willTradeCard;
 		self.tradePartner = willTradePartner;
 		self.tradeGive = willTradeGive;
+		self.willOpExpJump = willOpExpJump
 
 '''
 #Card - whether Card is an Event or a City Card
@@ -175,7 +176,7 @@ def create_edges(citiesList):
 
 
 #performs outbreak
-def outbreak(city, numOutbreaks, boardCities, alreadyOutbreaked):
+def outbreak(city, numOutbreaks, boardCities, alreadyOutbreaked, currentPlayer, players, blueCured, blueCities, yellowCured, yellowCities, blackCured,blackCities,  redCured, redCities):
 	
 	#print
 	print(str(numOutbreaks+1) + "th outbreak in " + city.name + "!");
@@ -201,14 +202,16 @@ def outbreak(city, numOutbreaks, boardCities, alreadyOutbreaked):
 	for i in city.neighbors:
 		if boardCities[i] in alreadyOutbreaked:
 			continue;
-		elif boardCities[i].numDiseaseCubes == 3:
-			numOutbreaks = outbreak(boardCities[i], numOutbreaks, boardCities, alreadyOutbreaked);
-		else:
-			boardCities[i].numDiseaseCubes += 1;
-			print(boardCities[i].name + " now has " + str(boardCities[i].numDiseaseCubes) + " disease cubes due to outbreak");
+		#dont outbreak/increase disease cube if current player is Medic and disease is cured
+		elif medicSaveInfection(players, i, blueCured, blueCities, yellowCured, yellowCities, redCured, redCities, blackCured, blackCities) == False:
+			if boardCities[i].numDiseaseCubes == 3:
+				numOutbreaks = outbreak(boardCities[i], numOutbreaks, boardCities, alreadyOutbreaked, currentPlayer, players, blueCured, blueCities, yellowCured, yellowCities, blackCured, blackCities, redCured, redCities);
+			else:
+				boardCities[i].numDiseaseCubes += 1;
+				print(boardCities[i].name + " now has " + str(boardCities[i].numDiseaseCubes) + " disease cubes due to outbreak");
 	return numOutbreaks;
 
-#choose_city - asks players for any city to travel to/place research center in.
+#choose_city - asks players for any city to travel to/place research center in using GOV GRANT/travel to if player is OP EXPERT.
 #this is repeated many times, so I made it a fn.
 def choose_city(citiesList):
 	#debug
@@ -221,9 +224,39 @@ def choose_city(citiesList):
 	return int(cityOption);
 
 
+#medic_save: returns true if medic prevents disease cube from landing on city, false if otherwise
+def medicSaveInfection(players, nextInfectedCity, curedBlue, blueCities, curedYellow, yellowCities, curedBlack, blackCities, curedRed, redCities):
+	for iter_player in players:
+		if iter_player.role == 'Medic' and iter_player.position == nextInfectedCity and curedBlue == True and nextInfectedCity in blueCities:
+			return True
+		elif iter_player.role == 'Medic' and iter_player.position == nextInfectedCity and curedYellow == True and nextInfectedCity in yellowCities:
+			return True
+		elif iter_player.role == 'Medic' and iter_player.position == nextInfectedCity and curedBlack == True and nextInfectedCity in blackCities:
+			return True
+		elif iter_player.role == 'Medic' and iter_player.position == nextInfectedCity and curedRed == True and nextInfectedCity in redCities:
+			return True
+	return False
+
+
+def discardCard(players, currentPlayer, blueCities, yellowCities, blackCities, redCities):
+		for i in range(len(players[currentPlayer].cards)):
+			if players[currentPlayer].cards[i] in blueCities:
+				print("\t" + str(i) + " - " + players[currentPlayer].cards[i] + " - BLUE");
+			elif players[currentPlayer].cards[i] in yellowCities:
+				print("\t" + str(i) + " - " + players[currentPlayer].cards[i] + " - YELLOW");
+			elif players[currentPlayer].cards[i] in blackCities:
+				print("\t" + str(i) + " - " + players[currentPlayer].cards[i] + " - BLACK");
+			elif players[currentPlayer].cards[i] in redCities:
+				print("\t" + str(i) + " - " + players[currentPlayer].cards[i] + " - RED");
+			else:
+				print("\t" + str(i) + " - " + players[currentPlayer].cards[i]);
+		discardOption = int(input("Select a number to discard:")); 
+		discardCard = players[currentPlayer].cards[discardOption];
+		players[currentPlayer].cards.remove(discardCard);	
+		print("you discarded your " + discardCard + " card");
+
 
 #play game
-#until difficulties are implemented, 
 def play_pandemic():
 
 	citiesList = create_cities('cities.txt');
@@ -286,9 +319,9 @@ def play_pandemic():
 			exit();
 		new_city.numDiseaseCubes = 0;
 		if (i == "Atlanta"):
-			new_city.hasResearchCenter = "true";
+			new_city.hasResearchCenter = True;
 		else:
-			new_city.hasResearchCenter = "false";
+			new_city.hasResearchCenter = False;
 		for j in citiesList:
 			#if not short term fix
 			if j == "EPIDEMIC" or j == "GOVERNMENT GRANT":
@@ -318,6 +351,23 @@ def play_pandemic():
 
 	numPlayers = int(input("how many players are playing?"));
 
+	#let players choose their roles.
+	counter = 0;
+	takenIndices = [];
+	while counter < numPlayers:
+		for i in range(len(character_roles)):
+			if i not in takenIndices:
+				print(str(i) + " - " + character_roles[i]);
+		nextRole = int(input("PLAYER " + str(counter) + ": PICK YOUR ROLE"));
+		takenIndices.append(nextRole);
+		counter = counter + 1;
+		new_player = Player(character_roles[nextRole]);
+		players.append(new_player);
+
+
+
+	'''
+	#this randomly assigns player roles
 	counter = 0;
 	while (counter < numPlayers):
 		role = random.choice(character_roles);
@@ -325,6 +375,8 @@ def play_pandemic():
 		new_player = Player(role);
 		players.append(new_player);
 		counter = counter + 1;
+	'''
+
 
 	'''
 	count = 1;
@@ -473,6 +525,9 @@ def play_pandemic():
 	blackCured = False;
 	redCured = False;
 
+	#player cards discard pile
+	playerDiscardPile = []
+
 	#check if trade works - comment this later
 	#playerCards.insert(0, "Atlanta");
 
@@ -492,7 +547,8 @@ def play_pandemic():
 		#debug
 		#testing for epidemic cards
 		for i in boardCities:
-			boardCities[i].startCityPrint();
+			if (boardCities[i].numDiseaseCubes != 0 or boardCities[i].hasResearchCenter == True):
+				boardCities[i].startCityPrint();
 
 
 		#no. of actions remaining.
@@ -527,7 +583,7 @@ def play_pandemic():
 				if players[currentPlayer].position in boardCities[i].neighbors:
 					print(str(optionIndex) + " - walk to " + boardCities[i].name);
 					optionIndex = optionIndex + 1;
-					newOption = Option(False, boardCities[i].name, True, False, False, False, False, False, False, False, False, False, "Atlanta", -1, False);
+					newOption = Option(False, boardCities[i].name, True, False, False, False, False, False, False, False, False, False, "Atlanta", -1, False, False);
 					cityOptions.append(newOption);
 
 			#store option to cure city.
@@ -535,31 +591,43 @@ def play_pandemic():
 				if (players[currentPlayer].position == boardCities[i].name and boardCities[i].numDiseaseCubes != 0):
 					print(str(optionIndex) + " - cure " + players[currentPlayer].position);
 					optionIndex = optionIndex + 1;
-					newOption = Option(True, "Atlanta", False, False, False, False, False, False, False, False, False, False, "Atlanta", -1, False);
+					newOption = Option(True, "Atlanta", False, False, False, False, False, False, False, False, False, False, "Atlanta", -1, False, False);
 					cityOptions.append(newOption);
 
-			#store options for direct flights
+			#store options for direct flights, Op Expert can fly anywhere if at a research center
+			if players[currentPlayer].role == 'Operations Expert' and boardCities[players[currentPlayer].position].hasResearchCenter == True:
+				print(str(optionIndex) + " - jump using Research Center")
+				optionIndex += 1
+				newOption = Option(False, "Atlanta", False, False, False, False, False, False, False, False, False, False, "Atlanta", -1, False, True)
+				cityOptions.append(newOption)
 			for i in players[currentPlayer].cards:
 				if i not in eventCardList:
 					print(str(optionIndex) + " - direct flight to " + i);
-					newOption = Option(False, i, False, True, False, False, False, False, False, False, False, False, "Atlanta", -1, False);
+					newOption = Option(False, i, False, True, False, False, False, False, False, False, False, False, "Atlanta", -1, False, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
 
 			#store option for building a research center
+			#if player is Operations Expert, doesn't need to discard card
+			if players[currentPlayer].role == 'Operations Expert':
+				print(str(optionIndex) + " - build research station in " + players[currentPlayer].position + " w/o card - Operations Expert")
+				newOption = Option(False, "OP EXPERT EFFECT", False, False, True, False, False, False, False, False, False, False, "Atlanta", -1, False, False)
+				cityOptions.append(newOption)
+				optionIndex += 1
+
 			for i in players[currentPlayer].cards:
 				if i == players[currentPlayer].position:
 					print(str(optionIndex) + " - build research station in " + i);
-					newOption = Option(False, i, False, False, True, False, False, False, False, False, False, False, "Atlanta", -1, False);
+					newOption = Option(False, i, False, False, True, False, False, False, False, False, False, False, "Atlanta", -1, False, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
 
-			#store options for teleporting a research center
-			if boardCities[players[currentPlayer].position].hasResearchCenter == "true":
+			#store options for teleporting between research centers
+			if boardCities[players[currentPlayer].position].hasResearchCenter == True:
 				for i in boardCities:
-					if boardCities[i].hasResearchCenter == "true" and i != players[currentPlayer].position:
+					if boardCities[i].hasResearchCenter == True and i != players[currentPlayer].position:
 						print(str(optionIndex) + " teleport to " + i + " via Research Station");
-						newOption = Option(False, i, False, False, False, True, False, False, False, False, False, False, "Atlanta", -1, False);
+						newOption = Option(False, i, False, False, False, True, False, False, False, False, False, False, "Atlanta", -1, False, False);
 						cityOptions.append(newOption);
 						optionIndex = optionIndex + 1;
 
@@ -567,13 +635,13 @@ def play_pandemic():
 			for i in players[currentPlayer].cards:
 				if i in eventCardList:
 					print(str(optionIndex) + " - use " + i + " event card.");
-					newOption = Option(False, i, False, False, False, False, True, False, False, False, False, False, "Atlanta", -1, False);
+					newOption = Option(False, i, False, False, False, False, True, False, False, False, False, False, "Atlanta", -1, False, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;		
 	
 			#store options for curing diseases
 			#if player is DOCTOR, only needs 4 cards of same color
-			if boardCities[players[currentPlayer].position].hasResearchCenter == "true":
+			if boardCities[players[currentPlayer].position].hasResearchCenter == True:
 				numBlueCards = 0;
 				numYellowCards = 0;
 				numBlackCards = 0;
@@ -589,22 +657,22 @@ def play_pandemic():
 						numRedCards = numRedCards + 1;
 				if numBlueCards >= 5 or (numBlueCards == 4 and players[currentPlayer].role == "Scientist"):
 					print(str(optionIndex) + " - cure BLUE disease");
-					newOption = Option(False, i, False, False, False, False, False, True, False, False, False, False, "Atlanta", -1, False);
+					newOption = Option(False, i, False, False, False, False, False, True, False, False, False, False, "Atlanta", -1, False, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
-				if numYellowCards >= 5 or (numYellowCards == 4 and players[currentPlayer].role == "Scientist"):
+				elif numYellowCards >= 5 or (numYellowCards == 4 and players[currentPlayer].role == "Scientist"):
 					print(str(optionIndex) + " - cure YELLOW disease");
-					newOption = Option(False, i, False, False, False, False, False, False, True, False, False, False, "Atlanta", -1, False);
+					newOption = Option(False, i, False, False, False, False, False, False, True, False, False, False, "Atlanta", -1, False, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
-				if numBlackCards >= 5 or (numBlackCards == 4 and players[currentPlayer].role == "Scientist"):
+				elif numBlackCards >= 5 or (numBlackCards == 4 and players[currentPlayer].role == "Scientist"):
 					print(str(optionIndex) + " - cure BLACK disease");
-					newOption = Option(False, i, False, False, False, False, False, False, False, True, False, False, "Atlanta", -1, False);
+					newOption = Option(False, i, False, False, False, False, False, False, False, True, False, False, "Atlanta", -1, False, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
-				if numRedCards >= 5 or (numRedCards == 4 and players[currentPlayer].role == "Scientist"):
+				elif numRedCards >= 5 or (numRedCards == 4 and players[currentPlayer].role == "Scientist"):
 					print(str(optionIndex) + " - cure RED disease");
-					newOption = Option(False, i, False, False, False, False, False, False, False, False, True, False, "Atlanta", -1, False);
+					newOption = Option(False, i, False, False, False, False, False, False, False, False, True, False, "Atlanta", -1, False, False);
 					cityOptions.append(newOption);
 					optionIndex = optionIndex + 1;
 			
@@ -614,15 +682,15 @@ def play_pandemic():
 					continue;
 				if players[i].position == players[currentPlayer].position:
 					for j in players[i].cards:
-						if j == players[i].position:
+						if j == players[i].position or players[i].role == 'Researcher':
 							print(str(optionIndex) + " - take " + j + " card from player " + str(i) + " - " + players[i].role);
-							newOption = Option(False, i, False, False, False, False, False, False, False, False, False, True, j, i, False);
+							newOption = Option(False, i, False, False, False, False, False, False, False, False, False, True, j, i, False, False);
 							cityOptions.append(newOption);
 							optionIndex = optionIndex + 1;
 					for j in players[currentPlayer].cards:
-						if j == players[i].position:
+						if j == players[i].position or players[currentPlayer].role == 'Researcher':
 							print(str(optionIndex) + " - give " + j + " card to player " + str(i) + " - " + players[i].role);
-							newOption = Option(False, i, False, False, False, False, False, False, False, False, False, True, j, i, True);
+							newOption = Option(False, i, False, False, False, False, False, False, False, False, False, True, j, i, True, False);
 							cityOptions.append(newOption);
 							optionIndex = optionIndex + 1;
 	
@@ -645,6 +713,9 @@ def play_pandemic():
 							boardCities[i].numDiseaseCubes = 0;
 						elif players[currentPlayer].position in redCities and redCured == True:
 							boardCities[i].numDiseaseCubes = 0;
+						elif players[currentPlayer].role == "Medic":
+							print("Medic special ability: removes all disease cubes for current city");
+							boardCities[i].numDiseaseCubes = 0;
 						else:
 							boardCities[i].numDiseaseCubes = boardCities[i].numDiseaseCubes - 1;
 						print(boardCities[i].name + " now has " + str(boardCities[i].numDiseaseCubes) + " disease cubes");
@@ -654,6 +725,21 @@ def play_pandemic():
 				print("you chose " + nextOption.city);
 				players[currentPlayer].position = nextOption.city;
 				print("moving to " + players[currentPlayer].position);
+				#if player is medic, then remove any disease cubes if cure has been discovered
+				for i in boardCities:
+					if players[currentPlayer].position == boardCities[i].name:
+						if boardCities[i].numDiseaseCubes != 0 and boardCities[i].name in blueCities and blueCured == True:
+							print("Medic special ability: walking through blue city and blue disease cured, so automatically removes disease cubes!");
+							boardCities[i].numDiseaseCubes = 0;
+						elif boardCities[i].numDiseaseCubes != 0 and boardCities[i].name in yellowCities and yellowCured == True:
+							print("Medic special ability: walking through yellow city and yellow disease cured, so automatically removes disease cubes!");
+							boardCities[i].numDiseaseCubes = 0;
+						elif boardCities[i].numDiseaseCubes != 0 and boardCities[i].name in blackCities and blackCured == True:
+							print("Medic special ability: walking through black city and black disease cured, so automatically removes disease cubes!");
+							boardCities[i].numDiseaseCubes = 0;	
+						elif boardCities[i].numDiseaseCubes != 0 and boardCities[i].name in redCities and redCured == True:
+							print("Medic special ability: walking through red city and red disease cured, so automatically removes disease cubes!");
+							boardCities[i].numDiseaseCubes = 0;
 
 			#if player wants to take a direct flight
 			elif nextOption.direct_flight == True:
@@ -671,14 +757,15 @@ def play_pandemic():
 			elif nextOption.buildResearchStation == True:
 				for i in boardCities:
 					if players[currentPlayer].position == boardCities[i].name:
-						boardCities[i].hasResearchCenter = "true";
+						boardCities[i].hasResearchCenter = True;
 						print("built a research station at " + boardCities[i].name);
-				#remove player's card
-				for i in players[currentPlayer].cards:
-					if i == nextOption.city:
-						playerDiscardPile.insert(0, i);
-						players[currentPlayer].cards.remove(i);
-						print("removed " + players[currentPlayer].position);
+				#remove player's card - Op Expert doesn't discard a card
+				if nextOption.city != 'OP EXPERT EFFECT':
+					for i in players[currentPlayer].cards:
+						if i == nextOption.city:
+							playerDiscardPile.insert(0, i);
+							players[currentPlayer].cards.remove(i);
+							print("removed " + players[currentPlayer].position);
 
 			#if player wants to teleport between stations
 			elif nextOption.teleportBetweenStations == True:
@@ -696,7 +783,7 @@ def play_pandemic():
 					citiesList = create_cities('cities.txt');
 					cityOption = choose_city(citiesList);
 					print("putting research center in " + citiesList[cityOption]);
-					boardCities[citiesList[cityOption]].hasResearchCenter = "true";
+					boardCities[citiesList[cityOption]].hasResearchCenter = True;
 					print("research center placed in " + citiesList[cityOption]);
 			
 				#AIRLIFT EVENT CARD
@@ -834,7 +921,12 @@ def play_pandemic():
 					players[currentPlayer].cards.insert(0, nextOption.tradeCard);
 					players[nextOption.tradePartner].cards.remove(nextOption.tradeCard);
 
-
+			#if Operations Expert wants to jump from Research Center
+			elif nextOption.opExpJump == True:
+				players[currentPlayer].position = choose_city(citiesList)
+				print("Operation Expert is jumping to " + players[currentPlayer].position)
+				print("Now discard a card:")
+				discardCard(players, currentPlayer, blueCities, blackCities, yellowCities, redCities)
 				'''	
 				for i in players[currentPlayer].cards:
 					if nextOption.city == i:
@@ -888,13 +980,26 @@ def play_pandemic():
 				#2. infect city at bottom of infection cards deck
 				nextInfectedCity = infectionCards.pop();
 				print("Drew an Epidemic - Epidemic in " + nextInfectedCity + ":(");
-				for i in boardCities:
-					if boardCities[i].name == nextInfectedCity:
-						boardCities[i].numDiseaseCubes = boardCities[i].numDiseaseCubes + 3;
-						if boardCities[i].numDiseaseCubes > 3:
-							boardCities[i].numDiseaseCubes = 3;
-							numOutbreaks = outbreak(boardCities[i], numOutbreaks, boardCities, []);
-
+				
+				'''
+				medicSaveInfection = False
+				for iter_player in players:
+					if iter_player.role == 'Medic' and iter_player.position == nextInfectedCity and curedBlue == True and nextInfectedCity in blueCities:
+						medicSaveInfection = True
+					elif iter_player.role == 'Medic' and iter_player.position == nextInfectedCity and curedYellow == True and nextInfectedCity in yellowCities:
+						medicSaveInfection = True
+					elif iter_player.role == 'Medic' and iter_player.position == nextInfectedCity and curedBlack == True and nextInfectedCity in blackCities:
+						medicSaveInfection = True
+					elif iter_player.role == 'Medic' and iter_player.position == nextInfectedCity and curedRed == True and nextInfectedCity in redCities:
+						medicSaveInfection = True
+				'''
+				if medicSaveInfection(players, nextInfectedCity, blueCured, blueCities, yellowCured, yellowCities, blackCured, blackCities, redCured, redCities) == False:
+					boardCities[nextInfectedCity].numDiseaseCubes = boardCities[nextInfectedCity].numDiseaseCubes + 3;
+					if boardCities[nextInfectedCity].numDiseaseCubes > 3:
+						boardCities[nextInfectedCity].numDiseaseCubes = 3;
+						numOutbreaks = outbreak(boardCities[nextInfectedCity], numOutbreaks, boardCities, [], players[currentPlayer], players, blueCured, blueCities, yellowCured, yellowCities, blackCured, blackCities, redCured, redCities);
+				else:
+					print("Medic prevented epidemic in " + nextInfectedCity)
 	
 				#3. re-shuffle epidemic'd city card into infection discard pile, shuffle discards, and put at top of infection deck
 				infectionDiscardPile.insert(0, nextInfectedCity);
@@ -920,21 +1025,30 @@ def play_pandemic():
 				nextInfectedCity = infectionCards.pop(0);
 				#print("drew " + nextInfectedCity " from infection Deck");
 				infectionDiscardPile.insert(0, nextInfectedCity);
-				for j in boardCities:
-					if boardCities[j].name == nextInfectedCity:
-						#this if causes issues when there are epidemics but no outbreaks - uncomment for now.
-						#if boardCities[j].numDiseaseCubes < 3:
-						if (boardCities[j].numDiseaseCubes == 3):
-							print("outbreak in " + boardCities[j].name + "!");
-							numOutbreaks = outbreak(boardCities[j], numOutbreaks, boardCities, []);
-						else:
-							boardCities[j].numDiseaseCubes = boardCities[j].numDiseaseCubes + 1;
-							print(boardCities[j].name + " now has " + str(boardCities[j].numDiseaseCubes) + " disease cubes");
+				#this if causes issues when there are epidemics but no outbreaks - uncomment for now.
+				#if boardCities[j].numDiseaseCubes < 3:
+				
+				'''
+				#if theres a medic and disease is cured, then dont put a disease cube
+				for currentPlayer in players:
+					if currentPlayer.role == "Medic" and currentPlayer.position == boardCities[j].name:
+						if boardCities[j].name in blueCities and blueCured == True:
+				'''
+				#medic save
+				if medicSaveInfection(players, nextInfectedCity, blueCured, blueCities, yellowCured, yellowCities, blackCured, blackCities, redCured, redCities) == False:
+					if (boardCities[nextInfectedCity].numDiseaseCubes == 3):
+						print("outbreak in " + boardCities[nextInfectedCity].name + "!");
+						numOutbreaks = outbreak(boardCities[nextInfectedCity], numOutbreaks, boardCities, [], players[currentPlayer], players, blueCured, blueCities, yellowCured, yellowCities, blackCured, blackCities, redCured, redCities);
+					else:
+						boardCities[nextInfectedCity].numDiseaseCubes = boardCities[nextInfectedCity].numDiseaseCubes + 1;
+						print(boardCities[nextInfectedCity].name + " now has " + str(boardCities[nextInfectedCity].numDiseaseCubes) + " disease cubes");
 
 
 		#if the player has more than 7 cards, discard cards until he/she has 7. 
 		while (len(players[currentPlayer].cards) > 7):
 			print("you have more than 7 cards - discard until you get to 7.");
+			discardCard(players, currentPlayer, blueCities, yellowCities, blackCities, redCities)
+			'''
 			for i in range(len(players[currentPlayer].cards)):
 				if players[currentPlayer].cards[i] in blueCities:
 					print("\t" + str(i) + " - " + players[currentPlayer].cards[i] + " - BLUE");
@@ -950,7 +1064,8 @@ def play_pandemic():
 			discardCard = players[currentPlayer].cards[discardOption];
 			players[currentPlayer].cards.remove(discardCard);	
 			print("you discarded your " + discardCard + " card");
-
+			'''
+	
 		#inc current Player, wrap around if necessary
 		currentPlayer = currentPlayer + 1;
 		if (currentPlayer >= len(players)):
